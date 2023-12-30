@@ -1,8 +1,12 @@
+from pathlib import Path
+
 import pygame
+
 import core.color
 import core.event
-from core.button import Button
+from btn.lesson import LessonBtn
 from btn.load import LoadBtn
+from core.button import Button
 
 
 class Laitner:
@@ -21,9 +25,17 @@ class Laitner:
 
     def _init_main(self):
         self.btns.append(LoadBtn((160, 105, 400, 60), self.screen))
+        self.btns.append(LessonBtn((160, 175, 400, 60), self.screen, Path('./example.txt')))
+        self.btns.append(LessonBtn((160, 345, 400, 60), self.screen, Path('./english.txt')))
 
     def _exit(self):
         self.running = False
+
+    def _load_click(self):
+        ...
+
+    def _lesson_click(self, path: Path):
+        print(path)
 
     def _mouse_click(self, pos: tuple[int, int], btn: int):
         for i in self.btns:
@@ -37,7 +49,9 @@ class Laitner:
                 case pygame.MOUSEBUTTONDOWN:
                     self._mouse_click(event.pos, event.button)
                 case core.event.LOAD_CLICK:
-                    print('Event!!')
+                    self._load_click()
+                case core.event.LESSON_CLICK:
+                    self._lesson_click(event.path)
 
     def loop(self):
         while self.running:

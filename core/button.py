@@ -33,5 +33,8 @@ class Button():
         )
 
     def handler(self, pos: tuple[int, int]):
-        if self.size[:2] <= pos <= (self.size[0] + self.size[2], self.size[1] + self.size[3]):
+        if (self.size[0] <= pos[0]) and \
+            (self.size[1] <= pos[1]) and \
+            (pos[0] <= self.size[0] + self.size[2]) and\
+            (pos[1] <= self.size[1] + self.size[3]):
             pygame.event.post(self.event)
