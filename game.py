@@ -1,6 +1,8 @@
 import pygame
 import core.color
+import core.event
 from core.button import Button
+from btn.load import LoadBtn
 
 
 class Laitner:
@@ -14,14 +16,18 @@ class Laitner:
         self.running = True
         self.background_color = core.color.BACKGROUND
 
-        self.btn = Button((100, 100, 200, 100), self.screen, (255, 255, 255), (255, 0, 0), font_size=100, text='Test')
+        self.btns: list[Button] = []
+        self._init_main()
+
+    def _init_main(self):
+        self.btns.append(LoadBtn((160, 105, 400, 60), self.screen))
 
     def _exit(self):
         self.running = False
 
     def _mouse_click(self, pos: tuple[int, int], btn: int):
-        self.btn.handler(pos)
-        print(pos, btn)
+        for i in self.btns:
+            i.handler(pos)
 
     def _event(self):
         for event in pygame.event.get():
@@ -30,12 +36,15 @@ class Laitner:
                     self._exit()
                 case pygame.MOUSEBUTTONDOWN:
                     self._mouse_click(event.pos, event.button)
+                case core.event.LOAD_CLICK:
+                    print('Event!!')
 
     def loop(self):
         while self.running:
             self._event()
             self.screen.fill(self.background_color)
-            self.btn.draw()
+            for i in self.btns:
+                i.draw()
             pygame.display.flip()
 
             self.clock.tick(self.fps)

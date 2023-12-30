@@ -1,6 +1,7 @@
 import pygame
 import core.color
 from core.button import Button
+from core.event import LOAD_CLICK
 
 
 class LoadBtn(Button):
@@ -9,4 +10,12 @@ class LoadBtn(Button):
         size: tuple[int, int, int, int],
         screen: pygame.Surface,
     ) -> None:
-        super().__init__(size, screen, core.color.TEXT, core.color.BTN_BACKGROUND, 100, 'Загрузить')
+        super().__init__(
+            size,
+            screen,
+            core.color.TEXT,
+            core.color.BTN_BACKGROUND,
+            pygame.event.Event(LOAD_CLICK),
+            50,
+            'Загрузить'
+        )
