@@ -1,11 +1,9 @@
-from pathlib import Path
 
 import pygame
 
 import core.color
 import core.event
-from btn.lesson import LessonBtn
-from core.button import Button
+from components.sprites.drag import DragDrop
 
 
 class Laitner:
@@ -19,8 +17,8 @@ class Laitner:
         self.running = True
         self.background_color = core.color.BACKGROUND
 
-        self.btns: list[Button] = []
-        self.btns_coords = [160, 35, 400, 60]
+        self.dragdrop = pygame.sprite.Group()
+        DragDrop(self.dragdrop)
 
     def _exit(self):
         self.running = False
@@ -28,16 +26,11 @@ class Laitner:
     def _load_click(self):
         print('load')
 
-    def _lesson_click(self, path: Path):
-        print(path)
-
     def _mouse_click(self, pos: tuple[int, int], btn: int):
-        for button in self.btns:
-            button.handler(pos)
+        ...
 
     def _drop(self, file: str):
-        self.btns_coords[1] += 70
-        self.btns.append(LessonBtn(tuple(self.btns_coords), self.screen, Path(file))) # type: ignore
+        print(file)
 
     def _event(self):
         for event in pygame.event.get():
@@ -48,8 +41,6 @@ class Laitner:
                     self._mouse_click(event.pos, event.button)
                 case core.event.LOAD_CLICK:
                     self._load_click()
-                case core.event.LESSON_CLICK:
-                    self._lesson_click(event.path)
                 case pygame.DROPFILE:
                     self._drop(event.file)
 
@@ -57,8 +48,8 @@ class Laitner:
         while self.running:
             self._event()
             self.screen.fill(self.background_color)
-            for button in self.btns:
-                button.draw()
+            self.dragdrop.draw(self.screen)
+
             pygame.display.flip()
 
             self.clock.tick(self.fps)

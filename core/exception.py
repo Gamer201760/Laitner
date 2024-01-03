@@ -1,0 +1,6 @@
+class LaitnerException(Exception):
+    ...
+
+
+class NotFound(LaitnerException):
+    ...
