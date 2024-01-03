@@ -5,7 +5,6 @@ import pygame
 import core.color
 import core.event
 from btn.lesson import LessonBtn
-from btn.load import LoadBtn
 from core.button import Button
 
 
@@ -21,25 +20,24 @@ class Laitner:
         self.background_color = core.color.BACKGROUND
 
         self.btns: list[Button] = []
-        self._init_main()
-
-    def _init_main(self):
-        self.btns.append(LoadBtn((160, 105, 400, 60), self.screen))
-        self.btns.append(LessonBtn((160, 175, 400, 60), self.screen, Path('./example.txt')))
-        self.btns.append(LessonBtn((160, 345, 400, 60), self.screen, Path('./english.txt')))
+        self.btns_coords = [160, 35, 400, 60]
 
     def _exit(self):
         self.running = False
 
     def _load_click(self):
-        ...
+        print('load')
 
     def _lesson_click(self, path: Path):
         print(path)
 
     def _mouse_click(self, pos: tuple[int, int], btn: int):
-        for i in self.btns:
-            i.handler(pos)
+        for button in self.btns:
+            button.handler(pos)
+
+    def _drop(self, file: str):
+        self.btns_coords[1] += 70
+        self.btns.append(LessonBtn(tuple(self.btns_coords), self.screen, Path(file))) # type: ignore
 
     def _event(self):
         for event in pygame.event.get():
@@ -52,13 +50,15 @@ class Laitner:
                     self._load_click()
                 case core.event.LESSON_CLICK:
                     self._lesson_click(event.path)
+                case pygame.DROPFILE:
+                    self._drop(event.file)
 
     def loop(self):
         while self.running:
             self._event()
             self.screen.fill(self.background_color)
-            for i in self.btns:
-                i.draw()
+            for button in self.btns:
+                button.draw()
             pygame.display.flip()
 
             self.clock.tick(self.fps)
