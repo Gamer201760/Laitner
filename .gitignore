@@ -2,3 +2,6 @@ __pycache__
 english.txt
 example.txt
 .vscode
+.ruff_cache
+test.py
+.DS_Store

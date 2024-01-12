@@ -1,39 +1,27 @@
+import fileinput
 from pathlib import Path
-from typing import Literal
-
-from file import File
+from typing import Iterator
 
 
-class Lesson(File):
-    def __init__(self, path: Path) -> None:
-        super().__init__(path)
+class Lesson:
+    def __init__(
+        self,
+        path: Path
+    ):
+        self.file = fileinput.input(
+            path,
+            inplace=True,
+        )
 
-    def get_background(self) -> Path | None:
-        line = self.file.readline()
-        if 'setting_background' in line:
-            return Path(line[line.find('=') + 1:])
-        self.file.seek(0)
+        self.remember: list[tuple[str, str]] = []
+        self.not_remember: list[tuple[str, str]] = []
 
-    def get(self) -> list[str]:
-        raw = self.readline()
-        if len(raw) == 0:
-            self.seek(0)
-            raw = self.readline()
-        return raw.split(';')
+        self.data: tuple[Iterator, Iterator] = (
+            iter(self.remember),
+            iter(self.not_remember)
+        )
 
-    def mark(self, mark: Literal['+', '-']):
-        line = self.line.split(';')
-
-        if len(line) == 3:
-            line[-1] = mark
-        else:
-            line.append(mark)
-
-        self.write(';'.join(line) + '\n')
-
-if __name__ == '__main__':
-    load = Lesson(Path('./example.txt'))
-    for i in range(1, 8):
-        print(load.get())
-        load.mark('+')
-    load.close()
+    def get(
+        self
+    ) -> tuple[Iterator, Iterator]:
+        return self.data

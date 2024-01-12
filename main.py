@@ -1,4 +1,4 @@
-from game import Laitner
+from core.game import Laitner
 
 game = Laitner((720, 480))
 game.loop()

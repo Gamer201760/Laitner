@@ -1,4 +1,4 @@
 import pygame
 
-LOAD_CLICK = pygame.USEREVENT + 1
-LESSON_CLICK = pygame.USEREVENT + 2
+REMEMBER_EVENT = pygame.USEREVENT + 1
+NOTREMEMBER_EVENT = pygame.USEREVENT + 2
