@@ -24,7 +24,7 @@ class Lesson:
         with open(self.path) as f:
             line = f.readline().strip()
             while line != '':
-                line = line.split(';')
+                line = line.split(';') # type: ignore
                 if len(line) < 2:
                     continue
                 if len(line) == 2:

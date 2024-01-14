@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 import pygame
 
@@ -106,18 +107,11 @@ class Laitner:
                 self.remember_back.click_handler(pos)
                 self.notremember_back.click_handler(pos)
 
-    def _remember(
-        self
+    def _remember_base(
+        self,
+        mark: Literal['+', '-']
     ):
-        self.pos += self.lesson.mark('+', self.mark, self.pos)
-        self._set_text()
-        self._shadow_detect(0)
-        self._shadow_detect(1)
-
-    def _notremember(
-        self
-    ):
-        self.pos += self.lesson.mark('-', self.mark, self.pos)
+        self.pos += self.lesson.mark(mark, self.mark, self.pos)
         self._set_text()
         self._shadow_detect(0)
         self._shadow_detect(1)
@@ -131,20 +125,12 @@ class Laitner:
             return
         self.stacks[i].set_shadow(False)
 
-    def _remember_click(
-        self
+    def _remember_click_base(
+        self,
+        mark: bool
     ):
         if self.card.is_enable() is False:
-            self.mark = True
-            self.card.set_visible(True)
-            self.pos = 0
-            self._set_text()
-
-    def _notremember_click(
-        self
-    ):
-        if self.card.is_enable() is False:
-            self.mark = False
+            self.mark = mark
             self.card.set_visible(True)
             self.pos = 0
             self._set_text()
@@ -165,6 +151,8 @@ class Laitner:
         self.lesson = Lesson(Path(file))
         self.lesson.load()
         self._set_text()
+        self._shadow_detect(0)
+        self._shadow_detect(1)
         self.nav('game')
 
     def _event(
@@ -182,13 +170,13 @@ class Laitner:
                 case pygame.MOUSEMOTION:
                     self._mouse_motion(event.pos, event.rel, event.buttons)
                 case core.event.REMEMBER_EVENT:
-                    self._remember()
+                    self._remember_base('+')
                 case core.event.NOTREMEMBER_EVENT:
-                    self._notremember()
+                    self._remember_base('-')
                 case core.event.REMEMBER_EVENT_CLICK:
-                    self._remember_click()
+                    self._remember_click_base(True)
                 case core.event.NOTREMEMBER_EVENT_CLICK:
-                    self._notremember_click()
+                    self._remember_click_base(False)
 
     def main_page(
         self
