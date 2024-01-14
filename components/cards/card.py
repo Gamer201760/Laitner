@@ -1,7 +1,6 @@
 import pygame
 
-import core.event
-from core.lesson import Lesson
+from core import event
 
 
 class Card:
@@ -12,7 +11,6 @@ class Card:
         border_radius: int,
         text_color: tuple,
         background_color: tuple,
-        lesson: Lesson | None = None,
         font_size: int = 14,
         magnet_poses: tuple | None = None,
         magnet_coefficient: int = 30
@@ -25,36 +23,52 @@ class Card:
         self.font_size = font_size
         self.magnet_poses = magnet_poses
         self.magnet_k = magnet_coefficient
-        self.enable = False
+        self.enable = True
         self.base_size = self.size.copy()
+        self.events = (
+            pygame.event.Event(event.NOTREMEMBER_EVENT),
+            pygame.event.Event(event.REMEMBER_EVENT)
+        )
 
         self.front = ''
         self.back = ''
         self.side = True
-        if lesson:
-            self.set_lesson(lesson)
 
     def draw(
         self
     ):
         if self.enable is False:
             return
-        if self.lesson is None:
-            return
         font = pygame.font.Font(None, self.font_size)
-        text = font.render(self.front if self.side else self.back, 1, self.text_color)
         pygame.draw.rect(
             self.screen,
             self.bg_color,
             self.size,
             border_radius=self.border_radius
         )
-        self.screen.blit(
-            text,
-            (
-                self.size[2] // 2 - text.get_width() // 2 + self.size[0],
-                self.size[3] // 2 - text.get_height() // 2 + self.size[1]
+        l_f = len(self.front)
+        text_pos = 0
+        for i in range(l_f):
+            text = font.render(self.front[i] if self.side else self.back[i], 1, self.text_color)
+            if i == 0:
+                text_pos = self._first_text(text, l_f)
+            else:
+                text_pos += self.font_size // 2 + 10
+            self.screen.blit(
+                text,
+                (
+                    self.size[2] // 2 - text.get_width() // 2 + self.size[0],
+                    text_pos
+                )
             )
+
+    def _first_text(
+        self,
+        text: pygame.Surface,
+        n: int
+    ):
+        return (
+            self.size[3] // 2 - text.get_height() // 2 + self.size[1] - ((n - 1) * (self.font_size // 2 + 5) // 2)
         )
 
     def move_handler(
@@ -68,6 +82,22 @@ class Card:
         (self.size[1] <= pos[1] <= self.size[1] + self.size[3]):
             self.size[0] += rel[0]
             self.size[1] += rel[1]
+
+    def set_text(
+        self,
+        front: str,
+        back: str
+    ):
+        self.front = self._split_text(front)
+        self.back = self._split_text(back)
+
+    def _split_text(
+        self,
+        text: str
+    ) -> list:
+        k = 14
+        a = [text[(i - 1) * k:k * i] for i in range(1, len(text) // k + 2)]
+        return a
 
     def update(
         self
@@ -83,17 +113,6 @@ class Card:
                 pygame.event.post(self.events[i])
                 self.size = self.base_size.copy()
 
-    def set_lesson(
-        self,
-        lesson: Lesson
-    ):
-        self.lesson = lesson
-        self.events = (
-            pygame.event.Event(core.event.NOTREMEMBER_EVENT, lesson=self.lesson),
-            pygame.event.Event(core.event.REMEMBER_EVENT, lesson=self.lesson)
-        )
-        self.enable = True
-
     def click_handler(
         self,
         pos: tuple[int, int]
@@ -103,4 +122,15 @@ class Card:
         if (self.size[0] <= pos[0] <= self.size[0] + self.size[2]) and \
         (self.size[1] <= pos[1] <= self.size[1] + self.size[3]):
             self.side = not self.side
+
+    def set_visible(
+        self,
+        state: bool
+    ):
+        self.enable = state
+
+    def is_enable(
+        self
+    ) -> bool:
+        return self.enable
 

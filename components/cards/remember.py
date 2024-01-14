@@ -1,7 +1,9 @@
+import pygame
 from pygame import Surface
 
 import core.color
 from components.cards.stack import Stack
+from core.event import REMEMBER_EVENT_CLICK
 
 
 class RememberStack(Stack):
@@ -18,5 +20,6 @@ class RememberStack(Stack):
             core.color.REMEMBER_BG,
             150,
             True,
-            '+'
+            '+',
+            event=pygame.event.Event(REMEMBER_EVENT_CLICK)
         )

@@ -1,6 +1,5 @@
-import fileinput
 from pathlib import Path
-from typing import Iterator
+from typing import Literal
 
 
 class Lesson:
@@ -8,20 +7,56 @@ class Lesson:
         self,
         path: Path
     ):
-        self.file = fileinput.input(
-            path,
-            inplace=True,
-        )
+        self.path = path
+        self.path_tmp = self.path.with_name(f'.{self.path.name}.tmp')
 
-        self.remember: list[tuple[str, str]] = []
-        self.not_remember: list[tuple[str, str]] = []
-
-        self.data: tuple[Iterator, Iterator] = (
-            iter(self.remember),
-            iter(self.not_remember)
-        )
+        self.data: tuple[list[list[str]], list[list[str]]] = ([], [])
+        self.marks = ('-', '+')
 
     def get(
         self
-    ) -> tuple[Iterator, Iterator]:
+    ) -> tuple[list[list[str]], list[list[str]]]:
         return self.data
+
+    def load(
+        self
+    ):
+        with open(self.path) as f:
+            line = f.readline().strip()
+            while line != '':
+                line = line.split(';')
+                if len(line) < 2:
+                    continue
+                if len(line) == 2:
+                    line.append('-')
+                self.data[self.marks.index(line[-1])].append(line)
+                line = f.readline().strip()
+        self.lens = [len(self.data[0]), len(self.data[1])]
+
+    def mark(
+        self,
+        mark: Literal['+', '-'],
+        data: bool,
+        pos: int
+    ):
+        if pos >= self.lens[data]:
+            return 0
+        if self.data[data][pos][-1] == mark:
+            return 1
+        self.data[data][pos][-1] = mark
+        self.data[not data].append(self.data[data].pop(pos))
+        self.lens[data] -= 1
+        self.lens[not data] += 1
+        return 0
+
+    def save(
+        self
+    ):
+        with open(self.path_tmp, 'w') as f:
+            for i in range(max(self.lens)):
+                if i < self.lens[0]:
+                    f.write(';'.join(self.data[0][i]) + '\n')
+                if i < self.lens[1]:
+                    f.write(';'.join(self.data[1][i]) + '\n')
+
+        self.path_tmp.rename(self.path.name)

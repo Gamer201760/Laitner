@@ -1,7 +1,9 @@
+import pygame
 from pygame import Surface
 
 import core.color
 from components.cards.stack import Stack
+from core.event import NOTREMEMBER_EVENT_CLICK
 
 
 class NotRememberStack(Stack):
@@ -18,5 +20,6 @@ class NotRememberStack(Stack):
             core.color.NOTREMEMBER_BG,
             150,
             True,
-            '-'
+            '-',
+            event=pygame.event.Event(NOTREMEMBER_EVENT_CLICK)
         )

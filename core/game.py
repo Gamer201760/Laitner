@@ -54,14 +54,18 @@ class Laitner:
             font_size=50,
             magnet_poses=(
                 self.notremember_back.size[:2],
-                self.notremember_back.size[:2]
+                self.remember_back.size[:2]
             )
         )
+
+        self.mark = False
+        self.pos = 0
 
     def _exit(
         self
     ):
         self.running = False
+        self.lesson.save()
 
     def _mouse_click(
         self,
@@ -94,12 +98,46 @@ class Laitner:
         match btn:
             case 1:
                 self.card.click_handler(pos)
+                self.remember_back.click_handler(pos)
+                self.notremember_back.click_handler(pos)
 
-    def _remember(self, lesson: Lesson):
-        ...
+    def _remember(
+        self
+    ):
+        self.pos += self.lesson.mark('+', self.mark, self.pos)
+        self._set_text()
 
-    def _notremember(self, lesson: Lesson):
-        ...
+    def _notremember(
+        self
+    ):
+        self.pos += self.lesson.mark('-', self.mark, self.pos)
+        self._set_text()
+
+    def _remember_click(
+        self
+    ):
+        if self.card.is_enable() is False:
+            self.mark = True
+            self.card.set_visible(True)
+            self.pos = 0
+            self._set_text()
+
+    def _notremember_click(
+        self
+    ):
+        if self.card.is_enable() is False:
+            self.mark = False
+            self.card.set_visible(True)
+            self.pos = 0
+            self._set_text()
+
+    def _set_text(
+        self
+    ):
+        if self.pos < self.lesson.lens[self.mark]:
+            self.card.set_text(*self.lesson.get()[self.mark][self.pos][:2])
+            return
+        self.card.set_visible(False)
 
     def _drop(
         self,
@@ -107,7 +145,8 @@ class Laitner:
     ):
         """Drop file handler"""
         self.lesson = Lesson(Path(file))
-        self.card.set_lesson(self.lesson)
+        self.lesson.load()
+        self._set_text()
         self.nav('game')
 
     def _event(
@@ -125,9 +164,13 @@ class Laitner:
                 case pygame.MOUSEMOTION:
                     self._mouse_motion(event.pos, event.rel, event.buttons)
                 case core.event.REMEMBER_EVENT:
-                    self._remember(event.lesson)
+                    self._remember()
                 case core.event.NOTREMEMBER_EVENT:
-                    self._notremember(event.lesson)
+                    self._notremember()
+                case core.event.REMEMBER_EVENT_CLICK:
+                    self._remember_click()
+                case core.event.NOTREMEMBER_EVENT_CLICK:
+                    self._notremember_click()
 
     def main_page(
         self

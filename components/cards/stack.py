@@ -14,7 +14,8 @@ class Stack:
         shadow: bool = False,
         text: str = '',
         magnet_pos: tuple[int, int] | None = None,
-        magnet_k: int = 30
+        magnet_k: int = 30,
+        event: pygame.event.Event | None = None
     ):
         self.screen = screen
         self.size = size
@@ -26,6 +27,7 @@ class Stack:
         self.text = text
         self.magnet_pos = magnet_pos
         self.magnet_k = magnet_k
+        self.event = event
 
         if shadow:
             self.shadow_size = self.size.copy()
@@ -62,3 +64,12 @@ class Stack:
                 self.size[3] // 2 - text.get_height() // 2 + self.size[1]
             )
         )
+
+    def click_handler(
+        self,
+        pos: tuple[int, int]
+    ):
+        if (self.size[0] <= pos[0] <= self.size[0] + self.size[2]) and \
+        (self.size[1] <= pos[1] <= self.size[1] + self.size[3]):
+            if self.event:
+                pygame.event.post(self.event)
