@@ -45,6 +45,11 @@ class Laitner:
             [420, 20, 280, 150]
         )
 
+        self.stacks = (
+            self.notremember_back,
+            self.remember_back
+        )
+
         self.card = Card(
             self.screen,
             [215, 308, 280, 150],
@@ -106,12 +111,25 @@ class Laitner:
     ):
         self.pos += self.lesson.mark('+', self.mark, self.pos)
         self._set_text()
+        self._shadow_detect(0)
+        self._shadow_detect(1)
 
     def _notremember(
         self
     ):
         self.pos += self.lesson.mark('-', self.mark, self.pos)
         self._set_text()
+        self._shadow_detect(0)
+        self._shadow_detect(1)
+
+    def _shadow_detect(
+        self,
+        i: int
+    ):
+        if self.lesson.lens[i] > 0:
+            self.stacks[i].set_shadow(True)
+            return
+        self.stacks[i].set_shadow(False)
 
     def _remember_click(
         self

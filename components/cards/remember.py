@@ -19,7 +19,7 @@ class RememberStack(Stack):
             core.color.TEXT,
             core.color.REMEMBER_BG,
             150,
-            True,
+            False,
             '+',
             event=pygame.event.Event(REMEMBER_EVENT_CLICK)
         )

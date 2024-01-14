@@ -19,7 +19,7 @@ class NotRememberStack(Stack):
             core.color.TEXT,
             core.color.NOTREMEMBER_BG,
             150,
-            True,
+            False,
             '-',
             event=pygame.event.Event(NOTREMEMBER_EVENT_CLICK)
         )

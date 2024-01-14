@@ -29,15 +29,14 @@ class Stack:
         self.magnet_k = magnet_k
         self.event = event
 
-        if shadow:
-            self.shadow_size = self.size.copy()
-            self.shadow_size[0] -= 5
-            self.shadow_size[1] -= 5
+        self.shadow_size = self.size.copy()
+        self.shadow_size[0] -= 5
+        self.shadow_size[1] -= 5
 
-            self.shadow_color = pygame.color.Color(self.bg_color)
-            hsl = list(self.shadow_color.hsla[:-1])
-            hsl[-1] -= 20
-            self.shadow_color.hsla = hsl # type: ignore
+        self.shadow_color = pygame.color.Color(self.bg_color)
+        hsl = list(self.shadow_color.hsla[:-1])
+        hsl[-1] -= 20
+        self.shadow_color.hsla = hsl # type: ignore
 
     def draw(
         self
@@ -73,3 +72,9 @@ class Stack:
         (self.size[1] <= pos[1] <= self.size[1] + self.size[3]):
             if self.event:
                 pygame.event.post(self.event)
+
+    def set_shadow(
+        self,
+        shadow: bool
+    ):
+        self.shadow = shadow
