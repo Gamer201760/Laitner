@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Literal
 
+from core.texts import WRONG_CARDS
+
 
 class Lesson:
     def __init__(
@@ -9,7 +11,8 @@ class Lesson:
     ):
         self.path = path
         self.path_tmp = self.path.with_name(f'.{self.path.name}.tmp')
-
+        print(self.path)
+        print(self.path_tmp)
         self.data: tuple[list[list[str]], list[list[str]]] = ([], [])
         self.marks = ('-', '+')
         self.errors = []
@@ -68,7 +71,7 @@ class Lesson:
                 if i < self.lens[1]:
                     f.write(';'.join(self.data[1][i]) + '\n')
             if self.errors:
-                f.write('# Не читаемы карты, пожалуйста исправьте их\n')
+                f.write(WRONG_CARDS + '\n')
                 f.writelines(self.errors)
 
-        self.path_tmp.rename(self.path.name)
+        self.path_tmp.rename(self.path)
