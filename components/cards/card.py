@@ -46,7 +46,7 @@ class Card:
             self.size,
             border_radius=self.border_radius
         )
-        l_f = len(self.front)
+        l_f = len(self.front if self.side else self.back)
         text_pos = 0
         for i in range(l_f):
             text = font.render(self.front[i] if self.side else self.back[i], 1, self.text_color)
@@ -93,11 +93,19 @@ class Card:
 
     def _split_text(
         self,
-        text: str
+        text: str,
+        k: int = 10
     ) -> list:
-        k = 14
-        a = [text[(i - 1) * k:k * i] for i in range(1, len(text) // k + 2)]
-        return a
+        last_pos = 0
+        res = []
+        for i in range(1, len(text)):
+            if last_pos is None:
+                break
+            near_space = text.find(' ', i * k)
+            near_space = None if near_space == -1 else near_space
+            res.append(text[last_pos:near_space].strip())
+            last_pos = near_space
+        return res
 
     def update(
         self

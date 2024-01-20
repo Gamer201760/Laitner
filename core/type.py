@@ -1,3 +1,3 @@
 from typing import Literal
 
-PAGES = Literal['main', 'game']
+PAGES = Literal['main', 'game', 'dialog']

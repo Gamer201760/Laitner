@@ -8,8 +8,10 @@ import core.event
 from components.cards.card import Card
 from components.cards.notremember import NotRememberStack
 from components.cards.remember import RememberStack
+from components.dialog.dialog import Dialog
 from components.sprites.drag import DragDrop
 from core.lesson import Lesson
+from core.texts import WRONG_FILE
 from core.type import PAGES
 
 
@@ -25,12 +27,12 @@ class Laitner:
         self.fps = 60
         self.clock = pygame.time.Clock()
         self.running = True
-        self.background_color = core.color.BACKGROUND
 
         self.page: PAGES = 'main'
         self.pages = {
             'main': self.main_page,
-            'game': self.game_page
+            'game': self.game_page,
+            'dialog': self.dialog_page
         }
 
         self.dragdrop = pygame.sprite.Group()
@@ -66,13 +68,18 @@ class Laitner:
 
         self.mark = False
         self.pos = 0
+        self.lesson: Lesson | None = None
+        self.dialog = Dialog(
+            self.screen
+        )
 
     def _exit(
         self
     ):
         """Exit handler"""
         self.running = False
-        self.lesson.save()
+        if self.lesson:
+            self.lesson.save()
 
     def _mouse_click(
         self,
@@ -83,6 +90,8 @@ class Laitner:
         match self.page:
             case 'game':
                 self._game_click(pos, btn)
+            case 'dialog':
+                self.dialog.handler(pos)
 
     def _mouse_motion(
         self,
@@ -112,6 +121,8 @@ class Laitner:
         self,
         mark: Literal['+', '-']
     ):
+        if self.lesson is None:
+            return
         self.pos += self.lesson.mark(mark, self.mark, self.pos)
         self._set_text()
         self._shadow_detect(0)
@@ -121,6 +132,8 @@ class Laitner:
         self,
         i: int
     ):
+        if self.lesson is None:
+            return
         if self.lesson.lens[i] > 0:
             self.stacks[i].set_shadow(True)
             return
@@ -140,6 +153,8 @@ class Laitner:
         self
     ):
         """Set text on card"""
+        if self.lesson is None:
+            return
         if self.pos < self.lesson.lens[self.mark]:
             self.card.set_text(*self.lesson.get()[self.mark][self.pos][:2])
             return
@@ -150,9 +165,11 @@ class Laitner:
         file: str
     ):
         """Drop file handler"""
-        f = Path(file)
-        f.is_
-        self.lesson = Lesson()
+        if not file.endswith('.txt'):
+            self.dialog.set_text(WRONG_FILE)
+            self.nav('dialog')
+            return
+        self.lesson = Lesson(Path(file))
         self.lesson.load()
         self._set_text()
         self._shadow_detect(0)
@@ -181,12 +198,20 @@ class Laitner:
                     self._remember_click_base(True)
                 case core.event.NOTREMEMBER_EVENT_CLICK:
                     self._remember_click_base(False)
+                case core.event.DIALOG_OK_EVENT:
+                    self.nav('main')
 
     def main_page(
         self
     ):
         """Main page event loop"""
         self.dragdrop.draw(self.screen)
+
+    def dialog_page(
+        self
+    ):
+        """Dialog page event loop"""
+        self.dialog.draw()
 
     def game_page(
         self
@@ -211,7 +236,7 @@ class Laitner:
         """Event loop"""
         while self.running:
             self._event()
-            self.screen.fill(self.background_color)
+            self.screen.fill(core.color.BACKGROUND)
             self.pages[self.page]()
             pygame.display.flip()
 
