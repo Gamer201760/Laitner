@@ -101,8 +101,13 @@ class Card:
         for i in range(1, len(text)):
             if last_pos is None:
                 break
-            near_space = text.find(' ', i * k)
-            near_space = None if near_space == -1 else near_space
+
+            if len(text) - k - 2 <= last_pos:
+                res.append(text[last_pos:].strip())
+                break
+            near_space = text.find(' ', i * k, i * k + 10)
+            if near_space == -1:
+                near_space = i * k
             res.append(text[last_pos:near_space].strip())
             last_pos = near_space
         return res

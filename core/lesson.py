@@ -43,6 +43,11 @@ class Lesson:
 
         self.lens = [len(self.data[0]), len(self.data[1])]
 
+    def is_error(
+        self
+    ) -> bool:
+        return bool(len(self.errors))
+
     def mark(
         self,
         mark: Literal['+', '-'],

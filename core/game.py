@@ -11,7 +11,7 @@ from components.cards.remember import RememberStack
 from components.dialog.dialog import Dialog
 from components.sprites.drag import DragDrop
 from core.lesson import Lesson
-from core.texts import WRONG_FILE
+from core.texts import ERROS_IN_FILE, WRONG_FILE
 from core.type import PAGES
 
 
@@ -171,6 +171,10 @@ class Laitner:
             return
         self.lesson = Lesson(Path(file))
         self.lesson.load()
+        if self.lesson.is_error():
+            self.dialog.set_text(ERROS_IN_FILE)
+            self.nav('dialog')
+            return
         self._set_text()
         self._shadow_detect(0)
         self._shadow_detect(1)
