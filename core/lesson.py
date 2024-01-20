@@ -12,6 +12,7 @@ class Lesson:
 
         self.data: tuple[list[list[str]], list[list[str]]] = ([], [])
         self.marks = ('-', '+')
+        self.errors = []
 
     def get(
         self
@@ -21,16 +22,22 @@ class Lesson:
     def load(
         self
     ):
+        """Load cards"""
         with open(self.path) as f:
-            line = f.readline().strip()
-            while line != '':
-                line = line.split(';') # type: ignore
-                if len(line) < 2:
+            raw = f.readline().strip()
+            while raw != '':
+                if raw.startswith('#'):
+                    raw = f.readline().strip()
                     continue
-                if len(line) == 2:
-                    line.append('-')
-                self.data[self.marks.index(line[-1])].append(line)
-                line = f.readline().strip()
+                line = raw.split(';')
+                if 1 < len(line) < 4:
+                    if len(line) == 2:
+                        line.append('-')
+                    self.data[self.marks.index(line[-1])].append(line)
+                else:
+                    self.errors.append(raw + '\n')
+                raw = f.readline().strip()
+
         self.lens = [len(self.data[0]), len(self.data[1])]
 
     def mark(
@@ -39,6 +46,7 @@ class Lesson:
         data: bool,
         pos: int
     ):
+        """Mark card"""
         if pos >= self.lens[data]:
             return 0
         if self.data[data][pos][-1] == mark:
@@ -52,11 +60,15 @@ class Lesson:
     def save(
         self
     ):
+        """Save files"""
         with open(self.path_tmp, 'w') as f:
             for i in range(max(self.lens)):
                 if i < self.lens[0]:
                     f.write(';'.join(self.data[0][i]) + '\n')
                 if i < self.lens[1]:
                     f.write(';'.join(self.data[1][i]) + '\n')
+            if self.errors:
+                f.write('# Не читаемы карты, пожалуйста исправьте их\n')
+                f.writelines(self.errors)
 
         self.path_tmp.rename(self.path.name)

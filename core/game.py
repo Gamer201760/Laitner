@@ -70,6 +70,7 @@ class Laitner:
     def _exit(
         self
     ):
+        """Exit handler"""
         self.running = False
         self.lesson.save()
 
@@ -138,6 +139,7 @@ class Laitner:
     def _set_text(
         self
     ):
+        """Set text on card"""
         if self.pos < self.lesson.lens[self.mark]:
             self.card.set_text(*self.lesson.get()[self.mark][self.pos][:2])
             return
@@ -148,7 +150,9 @@ class Laitner:
         file: str
     ):
         """Drop file handler"""
-        self.lesson = Lesson(Path(file))
+        f = Path(file)
+        f.is_
+        self.lesson = Lesson()
         self.lesson.load()
         self._set_text()
         self._shadow_detect(0)
@@ -181,11 +185,13 @@ class Laitner:
     def main_page(
         self
     ):
+        """Main page event loop"""
         self.dragdrop.draw(self.screen)
 
     def game_page(
         self
     ):
+        """Game page event loop"""
         self.card.update()
         self.remember_back.draw()
         self.notremember_back.draw()
@@ -195,12 +201,14 @@ class Laitner:
         self,
         page: PAGES
     ):
+        """Navigation between pages"""
         if self.page != page:
             self.page = page
 
     def loop(
         self
     ):
+        """Event loop"""
         while self.running:
             self._event()
             self.screen.fill(self.background_color)
