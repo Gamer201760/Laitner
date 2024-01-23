@@ -11,8 +11,6 @@ class Lesson:
     ):
         self.path = path
         self.path_tmp = self.path.with_name(f'.{self.path.name}.tmp')
-        print(self.path)
-        print(self.path_tmp)
         self.data: tuple[list[list[str]], list[list[str]]] = ([], [])
         self.marks = ('-', '+')
         self.errors = []

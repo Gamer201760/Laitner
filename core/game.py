@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from typing import Literal
 
@@ -80,6 +81,7 @@ class Laitner:
         self.running = False
         if self.lesson:
             self.lesson.save()
+        sys.exit()
 
     def _mouse_click(
         self,
@@ -245,4 +247,3 @@ class Laitner:
             pygame.display.flip()
 
             self.clock.tick(self.fps)
-        pygame.quit()
