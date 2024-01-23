@@ -22,6 +22,7 @@ class Laitner:
         size: tuple[int, int]
     ):
         pygame.init()
+        pygame.display.set_caption('Laitner')
 
         self.size = size
         self.screen = pygame.display.set_mode(size)
